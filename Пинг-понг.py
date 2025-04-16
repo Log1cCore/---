@@ -39,6 +39,10 @@ class Enemy(GameSprite):
             self.direction = 'right'
         if sprite.collide_rect(ball, racket2):
             self.direction = 'left'
+        if self.rect.x >= 850:
+            self.direction = 'left'
+        if self.rect.x <= 0:
+            self.direction = 'right'
         if self.rect.y >= 850:
             self.direction1 = 'up'
         if self.rect.y <= 0:
@@ -52,12 +56,27 @@ class Enemy(GameSprite):
         else:
             self.rect.y += self.speed
 
+def reset_ball():
+    ball.rect.x = 450
+    ball.rect.y = 450
+    if ball.direction == 'right':
+        ball.direction = 'left'
+    else:
+        ball.direction = 'right'
+    if ball.direction1 == 'up':
+        ball.direction1 = 'down'
+    else:
+        ball.direction1 = 'up'
+
 racket1 = Player('racket.png', 50, 350, 4, 40, 200)
 racket2 = Player('racket.png', 840, 350, 4, 40, 200)
-ball = Enemy('ball.png', 450, 450, 3, 50, 50)
+ball = Enemy('ball.png', 450, 450, 5, 50, 50)
 
 font.init()
 win = font.Font(None, 70)
+score = font.Font(None, 30)
+counter_l = 0
+counter_r = 0
 
 game = True
 finish = False
@@ -69,15 +88,26 @@ while game:
             game = False
     window.fill((179, 166, 226))
 
+    score_l = score.render(f'Левый игрок: {counter_l}', True, (153, 0, 155))
+    score_r = score.render(f'Правый игрок: {counter_r}', True, (153, 0, 155))
+    window.blit(score_l, (100, 10))
+    window.blit(score_r, (650, 10))
+
     if ball.rect.x >= 850:
+        counter_l += 1
+        reset_ball()
+    if ball.rect.x <= 0:
+        counter_r += 1
+        reset_ball()
+    
+    if counter_l == 5:
         win_text = win.render('Левый игрок выиграл!', True, (255, 41, 79))
         window.blit(win_text, (250, 400))
         finish = True
-    if ball.rect.x <= 0:
+    if counter_r == 5:
         win_text = win.render('Правый игрок выиграл!', True, (255, 41, 79))
         window.blit(win_text, (250, 400))
         finish = True
-
     
     racket1.reset()
     racket2.reset()
